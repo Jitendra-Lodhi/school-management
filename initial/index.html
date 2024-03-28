@@ -3,52 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Control</title>
+    <title>Volume-controlled</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .content {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                max-width: 90%;
+            }
+        }
+    </style>
 </head>
-<body>
-    <h1>Audio Control</h1>
-    <button id="playButton">Play Audio</button>
-    <audio id="myAudio" src="https://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/explosion%2001.wav" loop></audio>
+<body class="bg-gray-100">
+    <div class="container">
+        <div class="content">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Fill Range Minimum 70% then Click Okay & Open Image</h1>
+            <h5 class="text-2xl text-gray-800 mb-4">Up Your Volume To Increase This Range </h5>
+            <h5 class="text-1xl text-gray-800 mb-4">JavaScript Work With Your Hardware</h5>
+            <div id="volumeControlWrapper" class="flex items-center justify-center mb-4">
+                <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.5" oninput="checkVolume()" class="mr-2">
+                <button id="okayButton" onclick="proceedToNext()" disabled class="py-2 px-4 bg-blue-500 text-white rounded-lg shadow-md">Okay</button>
+            </div>
+            <div id="gallery" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" style="display: none;">
+                <div class="artwork cursor-pointer" onclick="toggleAnimation(1)">
+                    <img src="1s.jpg" alt="Artwork 1" class="w-full rounded-lg">
+                </div>
+                <div class="artwork cursor-pointer" onclick="toggleAnimation(1)">
+                    <img src="2s.jpg" alt="Artwork 1" class="w-full rounded-lg">
+                </div>
+                <div class="artwork cursor-pointer" onclick="toggleAnimation(1)">
+                    <img src="3s.jpg" alt="Artwork 1" class="w-full rounded-lg">
+                </div>
+                
+                <!-- Add more artworks as needed -->
+            </div>
+        </div>
+    </div>
+
     <script>
-        var audio = document.getElementById("myAudio");
-        var playButton = document.getElementById("playButton");
-        var isAudioPlaying = false;
+        var volumeControlWrapper = document.getElementById("volumeControlWrapper");
+        var gallery = document.getElementById("gallery");
+        var okayButton = document.getElementById("okayButton");
+        var volumeControl = document.getElementById("volumeControl");
+        var audioElements = document.querySelectorAll("audio");
+        var timeoutId;
 
-        // Detect earphone connection
-        navigator.mediaDevices.ondevicechange = function(event) {
-            var headphonesConnected = event && event.type === "devicechange";
-            if (headphonesConnected) {
-                // Mute the audio when headphones are connected
-                audio.muted = true;
+        function checkVolume() {
+            if (volumeControl.value > 0.7) {
+                okayButton.disabled = false;
+            } else {
+                okayButton.disabled = true;
             }
-        };
+        }
 
-        // Start playing audio on button click
-        playButton.addEventListener("click", function() {
-            // Check if audio is already playing
-            if (!isAudioPlaying) {
-                // Start playing audio
-                audio.play().catch(function(error) {
-                    // Autoplay failed, handle the error if needed
-                    console.error("Autoplay failed:", error);
-                });
+        function toggleAnimation(artworkId) {
+            clearTimeout(timeoutId);
+            audioElements.forEach(audio => {
+                audio.pause();
+            });
+            var audio = document.getElementById("audio" + artworkId);
+            audio.play();
+            timeoutId = setTimeout(stopAudio, 30000);
+        }
 
-                isAudioPlaying = true;
-            }
-        });
+        function stopAudio() {
+            audioElements.forEach(audio => {
+                audio.pause();
+            });
+        }
 
-        // Set the volume to maximum (1.0)
-        audio.volume = 1.0;
+        function proceedToNext() {
+            volumeControlWrapper.style.display = "none";
+            gallery.style.display = "grid";
+            okayButton.style.display = "none";
+            adjustVolume();
+        }
 
-        // Stop audio and redirect after 30 seconds
-        setTimeout(function() {
-            // Stop audio playback
-            audio.pause();
-            isAudioPlaying = false;
-
-            // Redirect to google.com
-            window.location.href = "https://www.google.com";
-        }, 30000); // 30 seconds in milliseconds
+        function adjustVolume() {
+            var volume = volumeControl.value;
+            audioElements.forEach(audio => {
+                audio.volume = volume;
+            });
+        }
     </script>
+
+    <!-- Audio elements for each artwork -->
+    <audio id="audio1" src="audio.mp3" loop></audio>
+    <audio id="audio2" src="audio.mp3" loop></audio>
+    <!-- Add more audio elements as needed -->
 </body>
 </html>

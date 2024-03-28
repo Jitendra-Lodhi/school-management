@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Control</title>
+</head>
+<body>
+    <h1>Audio Control</h1>
+    <button id="playButton">Play Audio</button>
+    <audio id="myAudio" src="https://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/explosion%2001.wav" loop></audio>
+    <script>
+        var audio = document.getElementById("myAudio");
+        var playButton = document.getElementById("playButton");
+        var isAudioPlaying = false;
+
+        // Detect earphone connection
+        navigator.mediaDevices.ondevicechange = function(event) {
+            var headphonesConnected = event && event.type === "devicechange";
+            if (headphonesConnected) {
+                // Mute the audio when headphones are connected
+                audio.muted = true;
+            }
+        };
+
+        // Start playing audio on button click
+        playButton.addEventListener("click", function() {
+            // Check if audio is already playing
+            if (!isAudioPlaying) {
+                // Start playing audio
+                audio.play().catch(function(error) {
+                    // Autoplay failed, handle the error if needed
+                    console.error("Autoplay failed:", error);
+                });
+
+                isAudioPlaying = true;
+            }
+        });
+
+        // Set the volume to maximum (1.0)
+        audio.volume = 1.0;
+
+        // Stop audio and redirect after 30 seconds
+        setTimeout(function() {
+            // Stop audio playback
+            audio.pause();
+            isAudioPlaying = false;
+
+            // Redirect to google.com
+            window.location.href = "https://www.google.com";
+        }, 30000); // 30 seconds in milliseconds
+    </script>
+</body>
+</html>
